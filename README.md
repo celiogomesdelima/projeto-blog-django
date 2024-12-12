@@ -4,10 +4,10 @@ Bem-vindo ao repositório do **Projeto Blog em Django**! Este é um sistema de b
 
 ## Tecnologias Utilizadas
 
-- **Python 3**
-- **Django 4**
+- **Python 3.12.4**
+- **Django 5.1.4**
 - Banco de Dados: SQLite (padrão, pode ser configurado para outros)
-- HTML/CSS/JavaScript para o front-end
+- HTML/CSS para o front-end
 
 ## Funcionalidades
 
