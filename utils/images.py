@@ -2,7 +2,7 @@ from pathlib import Path
 from django.conf import settings
 from PIL import Image
 
-def resize_image(image_django, new_width=16, new_height=16, optimize=True, quality=60):
+def resize_image(image_django, new_width=16, optimize=True, quality=100):
     """
     Redimensiona uma imagem carregada via Django para o tamanho especificado (padrão: 16x16 pixels).
 
@@ -18,11 +18,12 @@ def resize_image(image_django, new_width=16, new_height=16, optimize=True, quali
         image_pillow = Image.open(image_path)
         original_width, original_height = image_pillow.size
 
-        if original_width <= new_width and original_height <= new_height:
+        if original_width <= new_width:
             image_pillow.close()
             print("Imagem já está no tamanho apropriado.")
             return image_pillow
-
+        
+        new_height = round(new_width * original_height / original_width)
         new_image = image_pillow.resize((new_width, new_height), Image.Resampling.LANCZOS)
         new_image.save(
             image_path, format='PNG', optimize=optimize, quality=quality

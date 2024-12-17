@@ -1,6 +1,8 @@
 from django.contrib import admin
-from blog.models import Tag, Category, Page
-
+from blog.models import Tag, Category, Page, Post
+from django_summernote.admin import SummernoteModelAdmin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 # Register your models here.
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -25,7 +27,8 @@ class CategoryAdmin(admin.ModelAdmin):
     }
 
 @admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(SummernoteModelAdmin):
+    summernote_fields = 'content',
     list_display = 'title', 'slug', 'is_published', 'content',
     list_display_links = 'title',
     search_fields = 'title', 'slug', 'is_published', 'content',
@@ -34,4 +37,39 @@ class PageAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('title', ),
     }
+
+@admin.register(Post)
+class PostAdmin(SummernoteModelAdmin):
+    summernote_fields = 'content',
+    list_display = 'id', 'title', 'is_published', 'created_by',
+    list_display_links = 'title',
+    search_fields = 'id', 'slug', 'title', 'excerpt', 'content',
+    list_per_page = 50
+    list_filter = 'category', 'is_published',
+    list_editable = 'is_published',
+    ordering = '-id',
+    readonly_fields = (
+        'created_at', 'updated_at', 'updated_by', 'created_by', 'link'
+    )
+    prepopulated_fields = {
+        'slug':('title',),
+    }
+    autocomplete_fields = 'tags', 'category'
+
+    def link(self, obj):
+        if not obj.pk:
+            return '-'
         
+        url_do_post = obj.get_absolute_url()
+        safe_link = mark_safe(
+            f'<a target="_blank" href="{url_do_post}">{obj.title}</a>'
+            )
+        return safe_link
+
+    def save_model(self, request, obj, form, change) -> None:
+        if change:
+            obj.updated_by = request.user
+        else:
+            obj.created_by = request.user
+
+        return super().save_model(request, obj, form, change)
