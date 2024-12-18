@@ -9,14 +9,19 @@ from site_setup.models import *
 #     list_display_links = 'id', 'text', 'url_or_path',
 #     search_fields = 'id', 'text', 'url_or_path',
 
+
 class MenuLinkInline(admin.TabularInline):
     model = MenuLink
     extra = 1
 
+
 @admin.register(SiteSetup)
 class SiteSetupAdmin(admin.ModelAdmin):
-    list_display = 'title', 'description',
-    inlines = MenuLinkInline,
+    list_display = (
+        "title",
+        "description",
+    )
+    inlines = (MenuLinkInline,)
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return not SiteSetup.objects.all()[:1].exists()
